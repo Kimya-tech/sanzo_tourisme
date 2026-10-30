@@ -1,0 +1,30 @@
+# Dépendances et compilation
+node_modules
+dist
+coverage
+*.tsbuildinfo
+
+# Variables d'environnement : seul .env.example est versionné
+.env
+.env.*
+!.env.example
+
+# Vercel
+.vercel
+
+# Sauvegardes (données personnelles) : jamais dans Git
+sauvegardes/
+
+# Documents de travail et médias bruts (dépôt public)
+Media/
+*.docx
+
+# Journaux et fichiers système
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+
+# Éditeurs
+.idea
+*.swp
