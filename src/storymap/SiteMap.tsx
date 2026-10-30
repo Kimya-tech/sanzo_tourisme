@@ -99,13 +99,23 @@ export function SiteMap({ sites, activeId, hoveredId, onSelect, label }: SiteMap
     sitesRef.current = sites
 
     const active = activeId ? sites.find((site) => site.id === activeId) : undefined
+    // Largeur couverte à gauche par la barre de miniatures semi-transparente (0 sur téléphone).
+    const inset = parseFloat(getComputedStyle(map.getContainer()).getPropertyValue('--map-inset-left')) || 0
     if (active) {
       if (activeChanged || sitesChanged) {
-        map.flyTo([active.latitude, active.longitude], Math.max(map.getZoom(), SITE_ZOOM), { animate, duration: 1 })
+        const zoom = Math.max(map.getZoom(), SITE_ZOOM)
+        const center = map.unproject(map.project([active.latitude, active.longitude], zoom).subtract([inset / 2, 0]), zoom)
+        map.flyTo(center, zoom, { animate, duration: 1 })
       }
     } else if (!activeId && sites.length > 0 && (activeChanged || sitesChanged)) {
       const bounds = L.latLngBounds(sites.map((site) => [site.latitude, site.longitude] as L.LatLngTuple))
-      map.flyToBounds(bounds, { padding: [48, 48], maxZoom: 14, animate, duration: 0.8 })
+      map.flyToBounds(bounds, {
+        paddingTopLeft: [48 + inset, 48],
+        paddingBottomRight: [48, 48],
+        maxZoom: 14,
+        animate,
+        duration: 0.8,
+      })
     }
   }, [activeId, sites])
 
