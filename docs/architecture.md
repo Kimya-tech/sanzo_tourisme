@@ -39,6 +39,12 @@ vert.
   (toujours affiché sur écran tactile) et le repère correspondant est mis en évidence sur la carte. Le titre
   « Sites touristiques » a un fond flouté pour rester lisible sur la carte. Un site sans photo affiche « Pas
   encore de photo ».
+- **Défilement automatique** (ordinateur) : tant qu’aucun site n’est ouvert, le rouleau présente chaque site à
+  tour de rôle (toutes les 4 s : nom affiché, liseré blanc), puis revient au premier. Il ne sélectionne rien : ni
+  le panneau de droite ni la carte ne changent ; seul un clic ouvre un site. Il s’interrompt au survol, au focus
+  clavier ou au défilement manuel (reprise 6 s après), s’arrête pendant qu’un site est ouvert, et se met en pause
+  avec le bouton ⏸ en bas de la barre. Désactivé si le système demande de réduire les animations, et sur
+  téléphone (bande horizontale).
 - **Carte** : repères colorés selon la catégorie du site, avec une légende (catégories présentes uniquement ;
   repliée sur téléphone). Sélecteur « Plan / Satellite » (choix mémorisé) : plan OpenStreetMap, ou imagerie Esri
   World Imagery avec les noms de lieux. Au-delà de 50 sites, les repères proches sont regroupés en pastilles
@@ -158,7 +164,7 @@ facultative en base pour les sites antérieurs (affichés en gris, « Autre »),
 | --- | --- | --- |
 | pgTAP (53 tests) | [supabase/tests/database](../supabase/tests/database) | RLS, privilèges, liens personnels, révocation et limitation des essais, création / isolation / masquage des sites, photos, miniatures et stockage |
 | Intégration (14 tests) | [tests/integration](../tests/integration) | vraie API locale : visiteur, session anonyme sans code, collecteur, isolation, photos publiques, fichiers non image |
-| Unitaires et interface (80 tests) | `src/**/*.test.ts(x)` | plateforme (accueil et sites à découvrir, miniatures, ouverture / fermeture des détails, ordre photo / texte, catégorie et légende, visionneuse photo, bouton « Aller vers ce site » et lien Google Maps, survol, repères, précédent / suivant, lien partagé, page d’informations, langue, erreurs), recherche (filtre, accents, suggestions, clavier, aucun résultat), collecte (carte par défaut, bouton « Ajouter un site », formulaire et catégories, position, session périmée, accès désactivé, code dans le lien), validation, photos, brouillon, dates, traductions |
+| Unitaires et interface (81 tests) | `src/**/*.test.ts(x)` | plateforme (accueil et sites à découvrir, miniatures et défilement automatique, ouverture / fermeture des détails, ordre photo / texte, catégorie et légende, visionneuse photo, bouton « Aller vers ce site » et lien Google Maps, survol, repères, précédent / suivant, lien partagé, page d’informations, langue, erreurs), recherche (filtre, accents, suggestions, clavier, aucun résultat), collecte (carte par défaut, bouton « Ajouter un site », formulaire et catégories, position, session périmée, accès désactivé, code dans le lien), validation, photos, brouillon, dates, traductions |
 
 Scénarios de bout en bout vérifiés dans Microsoft Edge (compilation de production) :
 

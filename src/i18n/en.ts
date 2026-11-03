@@ -35,6 +35,8 @@ export const en: Translation<typeof fr> = {
     previousPhoto: 'Previous photo',
     nextPhoto: 'Next photo',
     photoCounter: '{{index}} / {{total}}',
+    pauseRotation: 'Pause the site carousel',
+    playRotation: 'Resume the site carousel',
     sitesHeading: 'Tourist sites',
     sitesCount_one: '{{count}} site',
     sitesCount_other: '{{count}} sites',

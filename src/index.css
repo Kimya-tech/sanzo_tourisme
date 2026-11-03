@@ -303,6 +303,28 @@ img {
 .thumbs-viewport::-webkit-scrollbar {
   display: none;
 }
+/* Pause / reprise du défilement automatique, en bas de la barre. */
+.thumbs-autoplay {
+  position: absolute;
+  left: 0.75rem;
+  bottom: 0.75rem;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(253 248 243 / 0.85);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.2);
+  color: var(--color-text);
+  cursor: pointer;
+}
+.thumbs-autoplay:hover {
+  background: #fff;
+}
 .thumbs {
   display: flex;
   flex-direction: column;
@@ -392,10 +414,15 @@ img {
   }
   .thumb:hover .thumb__name,
   .thumb:focus-visible .thumb__name,
-  .is-centered .thumb__name {
+  .thumbs-viewport:not(.is-rotating) .is-centered .thumb__name,
+  .is-presented .thumb__name {
     opacity: 1;
     transform: none;
   }
+}
+/* Site présenté par le défilement automatique : nom affiché et léger liseré. */
+.is-presented .thumb {
+  box-shadow: 0 0 0 3px rgb(255 255 255 / 0.95), 0 6px 16px rgb(0 0 0 / 0.3);
 }
 
 /* ---------- Panneau de détails ---------- */

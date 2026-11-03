@@ -31,6 +31,8 @@ export const fr = {
     previousPhoto: 'Photo précédente',
     nextPhoto: 'Photo suivante',
     photoCounter: '{{index}} / {{total}}',
+    pauseRotation: 'Mettre en pause le défilement des sites',
+    playRotation: 'Reprendre le défilement des sites',
     sitesHeading: 'Sites touristiques',
     sitesCount_one: '{{count}} site',
     sitesCount_other: '{{count}} sites',

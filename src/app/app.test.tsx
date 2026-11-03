@@ -295,6 +295,43 @@ describe('plateforme', () => {
     expect(welcome()).not.toBeInTheDocument()
   })
 
+  it('fait défiler les miniatures seul, sans ouvrir de site ni toucher à la carte ; un bouton le met en pause', async () => {
+    const scrollTo = vi.fn()
+    Object.defineProperty(HTMLElement.prototype, 'scrollTo', { value: scrollTo, configurable: true, writable: true })
+    // Ordinateur (rouleau vertical), sans demande de réduction des animations.
+    Object.defineProperty(window, 'matchMedia', {
+      configurable: true,
+      value: (query: string) => ({
+        matches: query.includes('min-width'),
+        addEventListener: () => {},
+        removeEventListener: () => {},
+      }),
+    })
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    try {
+      const router = renderAt('/fr')
+      await screen.findByRole('button', { name: 'Lac fictif' })
+      // Laisse React installer le minuteur de rotation (effets après affichage).
+      await act(async () => {})
+      act(() => vi.advanceTimersByTime(4100))
+      expect(scrollTo).toHaveBeenCalledWith({ top: expect.any(Number), behavior: 'smooth' })
+      expect(panel()).not.toBeInTheDocument()
+      expect(router.state.location.search).toBe('')
+      expect(screen.getByTestId('map')).toHaveAttribute('data-hovered', '')
+      expect(screen.getByTestId('map')).toHaveAttribute('data-active', '')
+
+      scrollTo.mockClear()
+      fireEvent.click(screen.getByRole('button', { name: 'Mettre en pause le défilement des sites' }))
+      act(() => vi.advanceTimersByTime(10_000))
+      expect(scrollTo).not.toHaveBeenCalled()
+      expect(screen.getByRole('button', { name: 'Reprendre le défilement des sites' })).toBeInTheDocument()
+    } finally {
+      vi.useRealTimers()
+      Reflect.deleteProperty(HTMLElement.prototype, 'scrollTo')
+      Reflect.deleteProperty(window, 'matchMedia')
+    }
+  })
+
   it('ferme l’accueil pour la durée de la visite ; le logo le rouvre', async () => {
     renderAt('/fr')
     await screen.findByRole('button', { name: 'Lac fictif' })
