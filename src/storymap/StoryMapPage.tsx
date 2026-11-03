@@ -1,18 +1,41 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Link, useSearchParams } from 'react-router'
+import { useSearchParams } from 'react-router'
 import { useTranslation } from 'react-i18next'
+import { Brand } from '../components/Brand'
 import { LanguageSwitcher } from '../components/LanguageSwitcher'
+import { SiteFooter } from '../components/SiteFooter'
 import { usePageTitle } from '../components/usePageTitle'
 import { useLanguage } from '../i18n/useLanguage'
+import { MapLegend } from './MapLegend'
 import { SearchBox } from './SearchBox'
 import { searchSites } from './search'
 import { SiteDetails } from './SiteDetails'
 import { SiteMap } from './SiteMap'
 import { SiteThumbnails } from './SiteThumbnails'
 import { useStorySites } from './useStorySites'
+import { WelcomePanel } from './WelcomePanel'
 
-// Page unique : miniatures des sites à gauche, carte au centre, détails du site sélectionné à droite.
-// Sur téléphone : carte plein écran avec bande de miniatures en bas ; les détails s'ouvrent sous la carte.
+const WELCOME_CLOSED_KEY = 'tourisme-sanzo.welcome-closed'
+
+function welcomeInitiallyOpen(): boolean {
+  try {
+    return sessionStorage.getItem(WELCOME_CLOSED_KEY) !== '1'
+  } catch {
+    return true
+  }
+}
+
+function rememberWelcome(open: boolean) {
+  try {
+    if (open) sessionStorage.removeItem(WELCOME_CLOSED_KEY)
+    else sessionStorage.setItem(WELCOME_CLOSED_KEY, '1')
+  } catch {
+    // Choix simplement non mémorisé.
+  }
+}
+
+// Page unique : miniatures des sites à gauche, carte au centre, à droite l'accueil ou les détails du site sélectionné.
+// Sur téléphone : carte plein écran avec bande de miniatures en bas ; accueil et détails s'ouvrent sous la carte.
 export function StoryMapPage() {
   const { t } = useTranslation()
   const language = useLanguage()
@@ -20,6 +43,8 @@ export function StoryMapPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const [query, setQuery] = useState('')
   const [hoveredId, setHoveredId] = useState<string | null>(null)
+  // Présentation affichée à l'arrivée ; une fois fermée, elle ne revient pas pendant la visite (sauf clic sur le logo).
+  const [welcomeOpen, setWelcomeOpen] = useState(welcomeInitiallyOpen)
 
   const results = useMemo(() => searchSites(sites, query), [sites, query])
   const requestedId = searchParams.get('site')
@@ -58,24 +83,37 @@ export function StoryMapPage() {
     if (!selected) return
     const handleKey = (event: KeyboardEvent) => {
       const target = event.target instanceof Element ? event.target : null
+      // Échap dans la visionneuse photo ou dans la recherche ne ferme pas le panneau.
+      if (target?.closest('dialog')) return
       if (event.key === 'Escape' && target?.getAttribute('role') !== 'combobox') select(null)
     }
     window.addEventListener('keydown', handleKey)
     return () => window.removeEventListener('keydown', handleKey)
   }, [select, selected])
 
+  const closeWelcome = () => {
+    setWelcomeOpen(false)
+    rememberWelcome(false)
+  }
+  const showWelcome = !selected && welcomeOpen && status !== 'error'
+  const hasPanel = Boolean(selected) || showWelcome
+
   return (
     <div className="explorer">
       <header className="explorer__header">
-        <Link className="brand" to={`/${language}`} onClick={() => setQuery('')}>
-          {t('app.name')}
-        </Link>
+        <Brand
+          onClick={() => {
+            setQuery('')
+            setWelcomeOpen(true)
+            rememberWelcome(true)
+          }}
+        />
         <SearchBox query={query} results={results} onQueryChange={setQuery} onSelect={select} />
         <LanguageSwitcher />
       </header>
       <h1 className="visually-hidden">{t('story.title')}</h1>
 
-      <div className={`explorer__body${selected ? ' has-panel' : ''}`}>
+      <div className={`explorer__body${hasPanel ? ' has-panel' : ''}`}>
         <nav className="site-strip" aria-label={t('story.sitesHeading')}>
           <h2 className="site-strip__heading">
             {t('story.sitesHeading')}{' '}
@@ -118,9 +156,10 @@ export function StoryMapPage() {
             onSelect={select}
             label={t('story.mapLabel')}
           />
+          {status === 'ready' && <MapLegend sites={sites} />}
         </div>
 
-        {selected && (
+        {selected ? (
           <aside className="site-panel" aria-label={t('story.panelLabel')}>
             <SiteDetails
               site={selected}
@@ -131,8 +170,11 @@ export function StoryMapPage() {
               onClose={() => select(null)}
             />
           </aside>
+        ) : (
+          showWelcome && <WelcomePanel sites={sites} onClose={closeWelcome} />
         )}
       </div>
+      <SiteFooter className="site-footer--bar" />
     </div>
   )
 }

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, Route, Routes, useLocation, useNavigate } from 'react-router'
 import { useTranslation } from 'react-i18next'
+import { Brand } from '../components/Brand'
 import { LanguageSwitcher } from '../components/LanguageSwitcher'
 import { usePageTitle } from '../components/usePageTitle'
 import { useLanguage } from '../i18n/useLanguage'
@@ -81,9 +82,7 @@ export function CollectHome() {
       />
 
       <header className="collect-topbar">
-        <Link className="brand" to={`/${language}`}>
-          {t('app.name')}
-        </Link>
+        <Brand />
         <LanguageSwitcher />
       </header>
 

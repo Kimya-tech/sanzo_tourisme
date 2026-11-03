@@ -21,6 +21,7 @@ const storyRows = [
     latitude: 5.28,
     longitude: 9.98,
     updated_at: '',
+    category: 'nature',
     photos: [
       { id: 'p1', path: 'u/s/photo-1.jpg', thumb: 'u/s/photo-1-thumb.jpg', caption: 'Vue du lac', width: 1600, height: 1200 },
       { id: 'p2', path: 'u/s/photo-2.jpg', thumb: null, caption: null, width: 1600, height: 1200 },
@@ -36,6 +37,7 @@ const storyRows = [
     latitude: 5.27,
     longitude: 10.0,
     updated_at: '',
+    category: 'village',
     photos: [],
   },
   {
@@ -117,11 +119,13 @@ function renderAt(path: string) {
 
 const thumbnails = () => within(screen.getByRole('navigation', { name: 'Sites touristiques' }))
 const panel = () => screen.queryByRole('complementary', { name: 'Détails du site' })
+const welcome = () => screen.queryByRole('complementary', { name: 'Bienvenue à Sanzo' })
 
 beforeEach(() => {
   supabaseState.result = { data: storyRows, error: null }
   supabaseState.session = null
   supabaseState.collector = null
+  sessionStorage.removeItem('tourisme-sanzo.welcome-closed')
 })
 
 describe('plateforme', () => {
@@ -271,6 +275,86 @@ describe('plateforme', () => {
     expect(await screen.findByText('Aucun site n’a encore été collecté.')).toBeInTheDocument()
   })
 
+  it('accueille le visiteur : logo, présentation, sites à découvrir et lien vers l’association', async () => {
+    renderAt('/fr')
+    await screen.findByRole('button', { name: 'Lac fictif' })
+    const panelWelcome = welcome()!
+    expect(within(panelWelcome).getByRole('img', { name: 'Logo du CODESA' })).toBeInTheDocument()
+    expect(panelWelcome).toHaveTextContent('Choisissez un site dans la liste ou sur la carte pour découvrir son histoire.')
+    expect(within(panelWelcome).getByRole('link', { name: /La communauté Mbo Sanzo/ })).toHaveAttribute(
+      'href',
+      'https://mbosanzo.com/',
+    )
+    // Seuls les sites qui ont une photo sont mis en avant.
+    const featured = within(panelWelcome).getAllByRole('link', { name: /Lac fictif|Village square|Forêt/ })
+    expect(featured).toHaveLength(1)
+    expect(featured[0]).toHaveTextContent('Patrimoine naturel')
+
+    fireEvent.click(featured[0]!)
+    expect(await screen.findByRole('complementary', { name: 'Détails du site' })).toBeInTheDocument()
+    expect(welcome()).not.toBeInTheDocument()
+  })
+
+  it('ferme l’accueil pour la durée de la visite ; le logo le rouvre', async () => {
+    renderAt('/fr')
+    await screen.findByRole('button', { name: 'Lac fictif' })
+    fireEvent.click(within(welcome()!).getByRole('button', { name: 'Fermer la présentation' }))
+    expect(welcome()).not.toBeInTheDocument()
+    expect(sessionStorage.getItem('tourisme-sanzo.welcome-closed')).toBe('1')
+
+    fireEvent.click(screen.getByRole('link', { name: 'Tourisme Sanzo, accueil' }))
+    expect(welcome()).toBeInTheDocument()
+    expect(sessionStorage.getItem('tourisme-sanzo.welcome-closed')).toBeNull()
+  })
+
+  it('indique la catégorie du site et la légende des couleurs de la carte', async () => {
+    renderAt(`/fr?site=${LAC}`)
+    const details = await screen.findByRole('complementary', { name: 'Détails du site' })
+    expect(details.querySelector('.site-details__category')).toHaveTextContent('Patrimoine naturel')
+    const legend = screen.getByText('Catégories des sites').closest('details')!
+    expect([...legend.querySelectorAll('li')].map((item) => item.textContent)).toEqual([
+      'Patrimoine naturel',
+      'Villages et lieux de vie',
+      'Autre',
+    ])
+  })
+
+  it('agrandit les photos en plein écran et les fait défiler au clavier', async () => {
+    renderAt(`/fr?site=${LAC}`)
+    const details = await screen.findByRole('complementary', { name: 'Détails du site' })
+    fireEvent.click(within(details).getByRole('button', { name: 'Agrandir la photo 1' }))
+    const viewer = screen.getByRole('dialog', { name: 'Photos : Lac fictif' })
+    expect(within(viewer).getByRole('img', { name: 'Vue du lac' })).toHaveAttribute('src', 'https://cdn.test/u/s/photo-1.jpg')
+    expect(viewer).toHaveTextContent('1 / 2')
+    expect(viewer).toHaveTextContent('Photo : Alice')
+
+    fireEvent.keyDown(viewer, { key: 'ArrowRight' })
+    expect(viewer).toHaveTextContent('2 / 2')
+    expect(within(viewer).getByRole('img', { name: 'Lac fictif, photo 2' })).toBeInTheDocument()
+    fireEvent.click(within(viewer).getByRole('button', { name: 'Photo suivante' }))
+    expect(viewer).toHaveTextContent('1 / 2')
+
+    // Échap ferme la visionneuse, pas le panneau de détails.
+    fireEvent.keyDown(viewer, { key: 'Escape' })
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(panel()).toBeInTheDocument()
+  })
+
+  it('présente l’association, la contribution, le contact et les mentions légales', async () => {
+    renderAt('/fr')
+    await screen.findByRole('button', { name: 'Lac fictif' })
+    const footer = screen.getAllByRole('navigation', { name: 'Informations sur le site' })[0]!
+    fireEvent.click(within(footer).getByRole('link', { name: 'Mentions légales' }))
+    expect(await screen.findByRole('heading', { level: 1, name: 'À propos de Tourisme Sanzo' })).toBeInTheDocument()
+    for (const name of ['À propos', 'Contribuer', 'Contact', 'Mentions légales']) {
+      expect(screen.getByRole('heading', { level: 2, name })).toBeInTheDocument()
+    }
+    expect(screen.getAllByRole('link', { name: 'codesannzo@gmail.com' })[0]).toHaveAttribute(
+      'href',
+      'mailto:codesannzo@gmail.com',
+    )
+  })
+
   it('affiche une page introuvable pour une URL inconnue', async () => {
     renderAt('/fr/inexistant')
     expect(await screen.findByRole('heading', { level: 1, name: 'Page introuvable' })).toBeInTheDocument()
@@ -401,6 +485,8 @@ describe('collecte', () => {
     const dialog = await screen.findByRole('dialog', { name: 'Nouveau site' })
     expect(router.state.location.pathname).toBe('/fr/collecte/nouveau')
     expect(dialog).toContainElement(screen.getByLabelText(/Nom du site touristique/))
+    expect(screen.getByLabelText(/Catégorie/)).toHaveDisplayValue('Choisir une catégorie')
+    expect(screen.getByRole('option', { name: 'Patrimoine naturel' })).toBeInTheDocument()
     expect(screen.getByLabelText(/Nom du collecteur/)).toHaveValue('Alice')
     expect(screen.getByTestId('collect-map')).toBeInTheDocument()
 

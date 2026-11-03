@@ -3,16 +3,19 @@
 Plateforme bilingue (français / anglais) des sites touristiques de la communauté Sanzo (région de l’Ouest,
 Cameroun), alimentée par une application de collecte utilisée par les membres de l’association.
 
-- **Plateforme** (`/fr`, `/en`) : page unique, ouverte à tous, sans compte. En-tête avec recherche ; à gauche
-  les miniatures des sites (en rouleau, nom au survol) ; au centre la carte ; à droite, au clic sur un site, ses
-  détails (en-tête collant avec un raccourci « Aller vers ce site » qui ouvre l’itinéraire dans Google Maps, puis
-  photo principale, texte, photo, texte…) pendant que la carte zoome sur le site.
+- **Plateforme** (`/fr`, `/en`) : page unique, ouverte à tous, sans compte. En-tête avec le logo du CODESA et la
+  recherche ; à gauche les miniatures des sites (en rouleau, nom du site central affiché) ; au centre la carte
+  (repères colorés par catégorie avec légende, vue plan ou satellite, regroupement au-delà de 50 sites) ; à
+  droite, un accueil (présentation de Sanzo, sites à découvrir) puis, au clic sur un site, ses détails (en-tête
+  collant avec un raccourci « Aller vers ce site » qui ouvre l’itinéraire dans Google Maps, catégorie, puis photo
+  principale, texte, photo, texte… ; photos agrandissables en plein écran) pendant que la carte zoome sur le
+  site. Pied de page et page `/fr/infos` : à propos, contribuer, contact, mentions légales.
 - **Collecte** (`/fr/collecte`) : application web pour téléphone, installable sur l’écran d’accueil. Chaque
   membre de l’association reçoit un lien personnel (révocable) contenant son code d’accès. L’écran principal est
   une carte plein écran qui suit la position du téléphone (autorisation demandée à l’ouverture), avec un grand
-  bouton « Ajouter un site ». Le formulaire s’ouvre par-dessus la carte : nom, description, date de collecte, nom
-  du collecteur (enregistré à la première ouverture), position GPS pré-remplie et photos. Les sites apparaissent
-  immédiatement sur la plateforme.
+  bouton « Ajouter un site ». Le formulaire s’ouvre par-dessus la carte : nom, catégorie, description, date de
+  collecte, nom du collecteur (enregistré à la première ouverture), position GPS pré-remplie et photos. Les sites
+  apparaissent immédiatement sur la plateforme.
 
 | Couche | Technologie |
 | --- | --- |
@@ -69,19 +72,20 @@ npm run db:reset; npm run db:test; npm run check; npm run test:integration; npm 
 
 ```
 src/
-  storymap/     plateforme : miniatures, carte Leaflet, détails des sites, recherche
+  storymap/     plateforme : accueil, miniatures, carte Leaflet et légende, détails des sites, visionneuse, recherche
   collect/      application de collecte (chargée à la demande)
   app/          routeur, langue dans l'URL
-  components/   composants partagés
+  components/   composants partagés (logo, pied de page…)
+  pages/        page d'informations, page introuvable
   i18n/         traductions FR/EN typées
-  lib/          client Supabase, carte, dates, erreurs, configuration
+  lib/          client Supabase, carte (plan / satellite), catégories, dates, erreurs, configuration
 supabase/
   migrations/   schéma versionné (source de vérité)
   tests/        tests pgTAP
   seed.sql      données de démonstration locales
-scripts/        photos de démonstration locales (demo-photos.mjs)
+scripts/        photos de démonstration locales (demo-photos.mjs), transfert d'un site vers la production
 tests/integration/   tests contre l'API Supabase locale
-public/         icônes et manifeste de l'application de collecte
+public/         logo du CODESA, photo de couverture, icônes et manifeste de l'application de collecte
 ```
 
 ## Sécurité : règles impératives

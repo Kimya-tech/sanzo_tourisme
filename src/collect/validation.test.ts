@@ -3,6 +3,7 @@ import { validateSiteForm, type SiteFormValues } from './validation'
 
 const valid: SiteFormValues = {
   name: 'Lac fictif',
+  category: 'nature',
   description: 'Une description suffisamment longue.',
   collectedOn: '2026-10-29',
   collectorName: 'Alice',
@@ -19,11 +20,12 @@ describe('validateSiteForm', () => {
   it('signale tous les champs manquants', () => {
     expect(
       validateSiteForm(
-        { ...valid, name: ' ', description: 'court', collectedOn: '', collectorName: '', latitude: null, longitude: null },
+        { ...valid, name: ' ', category: '', description: 'court', collectedOn: '', collectorName: '', latitude: null, longitude: null },
         '2026-10-29',
       ),
     ).toEqual([
       'validation.nameRequired',
+      'validation.categoryRequired',
       'validation.descriptionRequired',
       'validation.dateRequired',
       'validation.collectorRequired',

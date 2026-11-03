@@ -3,6 +3,7 @@ import { clearDraft, loadDraft, saveDraft, type SiteDraft } from './draft'
 
 const draft: SiteDraft = {
   name: 'Site',
+  category: 'culture',
   description: 'Texte en cours',
   collectedOn: '2026-10-29',
   collectorName: 'Alice',
@@ -31,9 +32,10 @@ describe('brouillon de collecte', () => {
   it('ignore un contenu corrompu', () => {
     localStorage.setItem('tourisme-sanzo.collect.draft', '{pas du json')
     expect(loadDraft()).toBeNull()
-    localStorage.setItem('tourisme-sanzo.collect.draft', JSON.stringify({ name: 3, latitude: 'x' }))
+    localStorage.setItem('tourisme-sanzo.collect.draft', JSON.stringify({ name: 3, category: 'plage', latitude: 'x' }))
     expect(loadDraft()).toEqual({
       name: '',
+      category: '',
       description: '',
       collectedOn: '',
       collectorName: '',

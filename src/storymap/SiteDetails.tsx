@@ -1,10 +1,12 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { Language } from '../i18n/languages'
+import { categoryColor } from '../lib/categories'
 import { googleMapsDirectionsUrl } from '../lib/directions'
 import { formatIsoDate } from '../lib/dates'
 import { photoUrl } from '../lib/supabase'
 import { interleaveContent, splitParagraphs } from './content'
+import { PhotoViewer } from './PhotoViewer'
 import type { StorySite } from './useStorySites'
 
 interface SiteDetailsProps {
@@ -22,6 +24,10 @@ export function SiteDetails({ site, language, previous, next, onSelect, onClose 
   const titleRef = useRef<HTMLHeadingElement>(null)
   const blocks = interleaveContent(site.photos, splitParagraphs(site.description))
   const credit = t('story.photoBy', { name: site.collectorName })
+  // Liée au site : la visionneuse se referme d'elle-même quand on passe à un autre site.
+  const [viewer, setViewer] = useState<{ siteId: string; index: number } | null>(null)
+  const viewerIndex = viewer?.siteId === site.id ? viewer.index : null
+  const setViewerIndex = (index: number | null) => setViewer(index === null ? null : { siteId: site.id, index })
 
   // Nouveau site : retour en haut du panneau et focus sur le titre (lecteurs d'écran).
   useEffect(() => {
@@ -58,6 +64,12 @@ export function SiteDetails({ site, language, previous, next, onSelect, onClose 
           ×
         </button>
       </header>
+      {site.category && (
+        <p className="site-details__category">
+          <span className="category-dot" style={{ background: categoryColor(site.category) }} aria-hidden="true" />
+          {t(`categories.${site.category}`)}
+        </p>
+      )}
       {site.language !== language && (
         <p className="site-details__note">{t('story.writtenIn', { language: t(`languageNames.${site.language}`) })}</p>
       )}
@@ -66,14 +78,29 @@ export function SiteDetails({ site, language, previous, next, onSelect, onClose 
         {blocks.map((block) =>
           block.type === 'photo' ? (
             <figure key={`photo-${block.photo.id}`} className="site-photo">
-              <img
-                src={photoUrl(block.photo.path)}
-                alt={block.photo.caption ?? t('story.photoAlt', { name: site.name, index: block.index + 1 })}
-                width={block.photo.width ?? undefined}
-                height={block.photo.height ?? undefined}
-                loading={block.index === 0 ? 'eager' : 'lazy'}
-                decoding="async"
-              />
+              <div className="site-photo__frame">
+                <img
+                  src={photoUrl(block.photo.path)}
+                  alt={block.photo.caption ?? t('story.photoAlt', { name: site.name, index: block.index + 1 })}
+                  width={block.photo.width ?? undefined}
+                  height={block.photo.height ?? undefined}
+                  loading={block.index === 0 ? 'eager' : 'lazy'}
+                  decoding="async"
+                />
+                <button
+                  type="button"
+                  className="site-photo__open"
+                  onClick={() => setViewerIndex(block.index)}
+                  aria-label={t('story.enlargePhoto', { index: block.index + 1 })}
+                >
+                  <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18">
+                    <path
+                      fill="currentColor"
+                      d="M4 4h6v2H6v4H4V4Zm10 0h6v6h-2V6h-4V4ZM4 14h2v4h4v2H4v-6Zm14 0h2v6h-6v-2h4v-4Z"
+                    />
+                  </svg>
+                </button>
+              </div>
               <figcaption>
                 {block.photo.caption && <span>{block.photo.caption} · </span>}
                 <span className="site-photo__credit">{credit}</span>
@@ -105,6 +132,15 @@ export function SiteDetails({ site, language, previous, next, onSelect, onClose 
           </button>
         )}
       </nav>
+
+      <PhotoViewer
+        photos={site.photos}
+        index={viewerIndex}
+        siteName={site.name}
+        credit={credit}
+        onIndexChange={setViewerIndex}
+        onClose={() => setViewerIndex(null)}
+      />
     </article>
   )
 }

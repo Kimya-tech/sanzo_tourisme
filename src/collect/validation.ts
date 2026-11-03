@@ -1,7 +1,9 @@
 import { isInCameroon } from '../lib/geo'
+import type { Category } from '../lib/categories'
 
 export interface SiteFormValues {
   name: string
+  category: Category | ''
   description: string
   collectedOn: string
   collectorName: string
@@ -12,6 +14,7 @@ export interface SiteFormValues {
 
 export type SiteFormError =
   | 'validation.nameRequired'
+  | 'validation.categoryRequired'
   | 'validation.descriptionRequired'
   | 'validation.dateRequired'
   | 'validation.collectorRequired'
@@ -24,6 +27,7 @@ export function validateSiteForm(values: SiteFormValues, today: string): SiteFor
   const length = (value: string) => value.trim().length
 
   if (length(values.name) < 2 || length(values.name) > 150) errors.push('validation.nameRequired')
+  if (!values.category) errors.push('validation.categoryRequired')
   if (length(values.description) < 10 || length(values.description) > 5000) {
     errors.push('validation.descriptionRequired')
   }

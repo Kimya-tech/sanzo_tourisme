@@ -53,14 +53,14 @@ isOneToOne: false
                   ]
                 },"sites": {
                   Row: {
-                    "collected_on": string,"collector_name": string,"created_at": string,"created_by": string | null,"description": string,"id": string,"is_published": boolean,"language": string,"latitude": number,"location": unknown,"location_accuracy_m": number | null,"longitude": number,"name": string,"sort_order": number | null,"updated_at": string
+                    "category": string | null,"collected_on": string,"collector_name": string,"created_at": string,"created_by": string | null,"description": string,"id": string,"is_published": boolean,"language": string,"latitude": number,"location": unknown,"location_accuracy_m": number | null,"longitude": number,"name": string,"sort_order": number | null,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "collected_on"?: string,"collector_name": string,"created_at"?: string,"created_by"?: string | null,"description": string,"id"?: string,"is_published"?: boolean,"language"?: string,"latitude": number,"location"?: never,"location_accuracy_m"?: number | null,"longitude": number,"name": string,"sort_order"?: number | null,"updated_at"?: string
+                    "category"?: string | null,"collected_on"?: string,"collector_name": string,"created_at"?: string,"created_by"?: string | null,"description": string,"id"?: string,"is_published"?: boolean,"language"?: string,"latitude": number,"location"?: never,"location_accuracy_m"?: number | null,"longitude": number,"name": string,"sort_order"?: number | null,"updated_at"?: string
                   }
                   Update: {
-                    "collected_on"?: string,"collector_name"?: string,"created_at"?: string,"created_by"?: string | null,"description"?: string,"id"?: string,"is_published"?: boolean,"language"?: string,"latitude"?: number,"location"?: never,"location_accuracy_m"?: number | null,"longitude"?: number,"name"?: string,"sort_order"?: number | null,"updated_at"?: string
+                    "category"?: string | null,"collected_on"?: string,"collector_name"?: string,"created_at"?: string,"created_by"?: string | null,"description"?: string,"id"?: string,"is_published"?: boolean,"language"?: string,"latitude"?: number,"location"?: never,"location_accuracy_m"?: number | null,"longitude"?: number,"name"?: string,"sort_order"?: number | null,"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -76,14 +76,14 @@ isOneToOne: false
           Views: {
             "story_sites": {
                   Row: {
-                    "collected_on": string,"collector_name": string,"description": string,"id": string,"language": string,"latitude": number,"longitude": number,"name": string,"photos": Json | null,"updated_at": string
+                    "category": string | null,"collected_on": string,"collector_name": string,"description": string,"id": string,"language": string,"latitude": number,"longitude": number,"name": string,"photos": Json | null,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                           "collected_on"?: string | null,"collector_name"?: string | null,"description"?: string | null,"id"?: string | null,"language"?: string | null,"latitude"?: number | null,"longitude"?: number | null,"name"?: string | null,"photos"?: never,"updated_at"?: string | null
+                           "category"?: string | null,"collected_on"?: string | null,"collector_name"?: string | null,"description"?: string | null,"id"?: string | null,"language"?: string | null,"latitude"?: number | null,"longitude"?: number | null,"name"?: string | null,"photos"?: never,"updated_at"?: string | null
                          }
                         Update: {
-                           "collected_on"?: string | null,"collector_name"?: string | null,"description"?: string | null,"id"?: string | null,"language"?: string | null,"latitude"?: number | null,"longitude"?: number | null,"name"?: string | null,"photos"?: never,"updated_at"?: string | null
+                           "category"?: string | null,"collected_on"?: string | null,"collector_name"?: string | null,"description"?: string | null,"id"?: string | null,"language"?: string | null,"latitude"?: number | null,"longitude"?: number | null,"name"?: string | null,"photos"?: never,"updated_at"?: string | null
                          }
                         Relationships: [
                     

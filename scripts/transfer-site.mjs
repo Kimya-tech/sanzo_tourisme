@@ -77,6 +77,7 @@ try {
     .from('sites')
     .insert({
       name: site.name,
+      category: site.category ?? null,
       description: site.description,
       collected_on: site.collected_on,
       collector_name: site.collector_name,

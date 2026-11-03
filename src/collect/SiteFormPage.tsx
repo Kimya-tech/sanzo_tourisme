@@ -5,6 +5,7 @@ import { Field, FormError } from '../components/Form'
 import { PageLoader } from '../components/PageLoader'
 import { usePageTitle } from '../components/usePageTitle'
 import { useLanguage } from '../i18n/useLanguage'
+import { CATEGORIES, isCategory, type Category } from '../lib/categories'
 import { todayIso } from '../lib/dates'
 import { errorKey, type ErrorKey } from '../lib/errors'
 import { createSite, deletePhoto, deleteSite, getMySite, updateSite, uploadPhoto, type ExistingPhoto } from './api'
@@ -20,6 +21,7 @@ import { validateSiteForm, type SiteFormError, type SiteFormValues } from './val
 function emptyValues(collectorName: string): SiteFormValues {
   return {
     name: '',
+    category: '',
     description: '',
     collectedOn: todayIso(),
     collectorName,
@@ -77,6 +79,7 @@ export function SiteFormPage({ onSaved, onClose }: SiteFormPageProps) {
         } else {
           setValues({
             name: site.name,
+            category: site.category,
             description: site.description,
             collectedOn: site.collectedOn,
             collectorName: site.collectorName,
@@ -146,6 +149,7 @@ export function SiteFormPage({ onSaved, onClose }: SiteFormPageProps) {
     setSaving(true)
     const input = {
       name: submitted.name,
+      category: submitted.category as Category,
       description: submitted.description,
       collectedOn: submitted.collectedOn,
       collectorName: submitted.collectorName,
@@ -244,6 +248,23 @@ export function SiteFormPage({ onSaved, onClose }: SiteFormPageProps) {
             aria-invalid={formErrors.includes('validation.nameRequired')}
           />
           {fieldError('validation.nameRequired')}
+        </Field>
+
+        <Field id="site-category" label={`${t('collect.category')} *`}>
+          <select
+            id="site-category"
+            value={values.category}
+            onChange={(event) => update('category', isCategory(event.target.value) ? event.target.value : '')}
+            aria-invalid={formErrors.includes('validation.categoryRequired')}
+          >
+            <option value="">{t('collect.categoryPlaceholder')}</option>
+            {CATEGORIES.map((category) => (
+              <option key={category} value={category}>
+                {t(`categories.${category}`)}
+              </option>
+            ))}
+          </select>
+          {fieldError('validation.categoryRequired')}
         </Field>
 
         <Field id="site-description" label={`${t('collect.description')} *`} hint={t('collect.descriptionHint')}>

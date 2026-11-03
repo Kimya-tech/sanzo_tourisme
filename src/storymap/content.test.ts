@@ -48,6 +48,7 @@ const site = (id: string, name: string, description = '', collectorName = 'Alice
   collectedOn: '2026-10-01',
   collectorName,
   language: 'fr',
+  category: null,
   latitude: 5.28,
   longitude: 9.98,
   photos: [],

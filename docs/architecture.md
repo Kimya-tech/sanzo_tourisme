@@ -4,8 +4,9 @@
 
 | Adresse | Public | Rôle |
 | --- | --- | --- |
-| `/fr`, `/en` | tout le monde | plateforme : miniatures des sites, carte, détails du site sélectionné, recherche |
+| `/fr`, `/en` | tout le monde | plateforme : accueil, miniatures des sites, carte, détails du site sélectionné, recherche |
 | `/fr?site=<id>` | tout le monde | lien partageable : ouvre directement les détails d’un site |
+| `/fr/infos` | tout le monde | à propos, contribuer, contact, mentions légales (`#a-propos`, `#contribuer`, `#contact`, `#mentions-legales`) |
 | `/fr/collecte#code=<code>` | membres de l’association | première ouverture : nom du collecteur |
 | `/fr/collecte` | collecteurs enregistrés | carte plein écran, position de l’utilisateur, bouton « Ajouter un site » |
 | `/fr/collecte/nouveau`, `/fr/collecte/<id>` | collecteurs enregistrés | formulaire ouvert par-dessus la carte (saisie / modification) |
@@ -16,23 +17,42 @@ préparation des photos) est chargée à la demande : elle n’alourdit pas la p
 
 ## 2. Plateforme
 
-**Ordinateur** : en-tête avec la recherche ; à gauche, les miniatures des sites ; au centre, la carte ; à droite,
-le panneau de détails (27 rem), ouvert uniquement lorsqu’un site est sélectionné.
+**Ordinateur** : en-tête bordeaux avec le logo du CODESA et la recherche ; à gauche, les miniatures des sites
+(posées sur la carte) ; au centre, la carte ; à droite, un panneau (largeur proportionnelle à l’écran, 28 à
+38 rem) qui affiche l’accueil ou les détails du site sélectionné ; en bas, un pied de page (à propos, contribuer,
+contact, mentions légales, lien vers mbosanzo.com).
 **Téléphone** : la recherche passe sous le nom du site ; les miniatures forment une bande défilante en bas de la
-carte ; un site sélectionné s’affiche sous la carte (38 % de la hauteur pour la carte).
+carte ; l’accueil ou le site sélectionné s’affiche sous la carte (38 % de la hauteur pour la carte) ; les liens
+du pied de page sont en bas de l’accueil.
 
+Identité : logo du CODESA (`public/logo-codesa.jpg`), photo de couverture (`public/cover-sanzo.jpg`, à remplacer
+par une autre photo autorisée si besoin), titres en Fraunces (police hébergée avec le site), palette bordeaux et
+vert.
+
+- **Accueil** (panneau de droite tant qu’aucun site n’est ouvert) : photo de couverture, logo, présentation de
+  Sanzo (reprise de mbosanzo.com), invitation à choisir un site, trois sites « À découvrir » (les premiers du
+  parcours qui ont une photo) et lien vers mbosanzo.com. Il se ferme par « × » pour toute la durée de la visite ;
+  un clic sur le logo le rouvre.
 - **Miniatures** : photo principale (version 480 px) de chaque site, en rouleau sans barre de défilement
   (3 miniatures nettes au centre, les autres réduites et estompées ; le site sélectionné est ramené au centre).
-  Au survol, la miniature s’agrandit légèrement, affiche le nom du site (toujours affiché sur écran tactile) et
-  le repère correspondant est mis en évidence sur la carte. Un site sans photo affiche « Pas encore de photo ».
+  Le nom de la miniature centrale reste affiché ; au survol, la miniature s’agrandit légèrement, affiche son nom
+  (toujours affiché sur écran tactile) et le repère correspondant est mis en évidence sur la carte. Le titre
+  « Sites touristiques » a un fond flouté pour rester lisible sur la carte. Un site sans photo affiche « Pas
+  encore de photo ».
+- **Carte** : repères colorés selon la catégorie du site, avec une légende (catégories présentes uniquement ;
+  repliée sur téléphone). Sélecteur « Plan / Satellite » (choix mémorisé) : plan OpenStreetMap, ou imagerie Esri
+  World Imagery avec les noms de lieux. Au-delà de 50 sites, les repères proches sont regroupés en pastilles
+  numérotées (extension `leaflet.markercluster`, chargée seulement dans ce cas).
 - **Sélection** (clic sur une miniature, un repère ou une suggestion de recherche) : le panneau s’ouvre et la carte
   zoome sur le site. Fermeture par « × », la touche Échap ou le bouton Retour du navigateur.
 - **Détails** : en-tête collant (reste visible au défilement) avec le nom, le raccourci « Aller vers ce site »
-  (icône ronde, libellé en info-bulle et pour les lecteurs d’écran) et « × » ; puis la photo principale, un
-  paragraphe, une autre photo, un
+  (icône ronde, libellé en info-bulle et pour les lecteurs d’écran) et « × » ; la catégorie ; puis la photo
+  principale, un paragraphe, une autre photo, un
   paragraphe, etc. (chaque retour à la ligne de la description est un paragraphe ; photos ou paragraphes en
   surplus à la suite). Chaque photo est créditée au collecteur ; « Collecté par … le … » figure en bas du panneau,
   avant les boutons « Site précédent / suivant ».
+- **Visionneuse** : un clic sur une photo l’ouvre en plein écran (fenêtre modale) ; flèches du clavier, boutons
+  ‹ › ou balayage au doigt pour passer d’une photo à l’autre ; Échap ou « × » pour revenir à la fiche.
 - **Itinéraire** : « Aller vers ce site » ouvre Google Maps (application sur téléphone si elle est installée,
   sinon le site web, dans un nouvel onglet) avec l’itinéraire vers les coordonnées GPS du site, au départ de la
   position actuelle de l’utilisateur ; le mode de transport se choisit dans Google Maps. Lien du type
@@ -70,8 +90,9 @@ carte ; un site sélectionné s’affiche sous la carte (38 % de la hauteur pour
    **session anonyme** Supabase (aucun e-mail ni mot de passe, conservée sur l’appareil) et appelle
    `register_collector(code, nom)`.
 3. Le nom est proposé par défaut comme « Nom du collecteur » de chaque nouveau site (modifiable).
-4. Formulaire : nom, description, date de collecte (aujourd’hui par défaut, jamais dans le futur), nom du
-   collecteur, position, photos (appareil photo ou galerie, légende facultative). La position d’un nouveau site
+4. Formulaire : nom, catégorie (liste fermée, obligatoire), description, date de collecte (aujourd’hui par
+   défaut, jamais dans le futur), nom du collecteur, position (plan ou satellite), photos (appareil photo ou
+   galerie, légende facultative). La position d’un nouveau site
    suit le GPS du téléphone jusqu’à ce que la personne la déplace sur la mini-carte.
 5. Les photos sont réduites à 1600 px et réencodées en JPEG sur le téléphone, avec une miniature de 480 px pour la
    liste des sites de la plateforme : envoi plus rapide en 3G, et
@@ -93,7 +114,7 @@ Schéma : [supabase/migrations](../supabase/migrations).
 | Table | Contenu |
 | --- | --- |
 | `collectors` | session anonyme → lien de collecte utilisé, nom du collecteur |
-| `sites` | nom, description, date, collecteur, langue, latitude/longitude (+ `geography` PostGIS calculée), précision, `sort_order`, `is_published` |
+| `sites` | nom, catégorie, description, date, collecteur, langue, latitude/longitude (+ `geography` PostGIS calculée), précision, `sort_order`, `is_published` |
 | `site_photos` | chemin de la photo et de sa miniature dans le bucket, légende, dimensions, ordre |
 | `private.collect_invites` | un lien de collecte par membre : libellé, code haché (SHA-256), actif ou non |
 | `private.collect_code_failures` | tentatives de code erronées (limitation) |
@@ -101,6 +122,9 @@ Schéma : [supabase/migrations](../supabase/migrations).
 
 Contrôles en base (doublés dans le formulaire) : nom 2–150 caractères, description 10–5000, date entre 2000 et
 aujourd’hui, position au Cameroun (détecte l’inversion latitude/longitude), chemin de photo cohérent avec le site.
+Catégories (`category`) : `nature` (patrimoine naturel), `history` (patrimoine historique), `culture` (culture et
+traditions), `village` (villages et lieux de vie), `food` (gastronomie et savoir-faire), `event` (événements) ;
+facultative en base pour les sites antérieurs (affichés en gris, « Autre »), obligatoire dans le formulaire.
 
 ## 5. Sécurité
 
@@ -134,7 +158,7 @@ aujourd’hui, position au Cameroun (détecte l’inversion latitude/longitude),
 | --- | --- | --- |
 | pgTAP (53 tests) | [supabase/tests/database](../supabase/tests/database) | RLS, privilèges, liens personnels, révocation et limitation des essais, création / isolation / masquage des sites, photos, miniatures et stockage |
 | Intégration (14 tests) | [tests/integration](../tests/integration) | vraie API locale : visiteur, session anonyme sans code, collecteur, isolation, photos publiques, fichiers non image |
-| Unitaires et interface (75 tests) | `src/**/*.test.ts(x)` | plateforme (miniatures, ouverture / fermeture des détails, ordre photo / texte, bouton « Aller vers ce site » et lien Google Maps, survol, repères, précédent / suivant, lien partagé, langue, erreurs), recherche (filtre, accents, suggestions, clavier, aucun résultat), collecte (carte par défaut, bouton « Ajouter un site », formulaire, position, session périmée, accès désactivé, code dans le lien), validation, photos, brouillon, dates, traductions |
+| Unitaires et interface (80 tests) | `src/**/*.test.ts(x)` | plateforme (accueil et sites à découvrir, miniatures, ouverture / fermeture des détails, ordre photo / texte, catégorie et légende, visionneuse photo, bouton « Aller vers ce site » et lien Google Maps, survol, repères, précédent / suivant, lien partagé, page d’informations, langue, erreurs), recherche (filtre, accents, suggestions, clavier, aucun résultat), collecte (carte par défaut, bouton « Ajouter un site », formulaire et catégories, position, session périmée, accès désactivé, code dans le lien), validation, photos, brouillon, dates, traductions |
 
 Scénarios de bout en bout vérifiés dans Microsoft Edge (compilation de production) :
 

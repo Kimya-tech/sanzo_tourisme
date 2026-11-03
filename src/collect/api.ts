@@ -1,9 +1,11 @@
 import type { Language } from '../i18n/languages'
+import { isCategory, type Category } from '../lib/categories'
 import { PHOTO_BUCKET, supabase } from '../lib/supabase'
 import type { PreparedPhoto } from './photos'
 
 export interface SiteInput {
   name: string
+  category: Category
   description: string
   collectedOn: string
   collectorName: string
@@ -39,15 +41,17 @@ export interface ExistingPhoto {
 
 const filesOf = (photo: ExistingPhoto) => (photo.thumbPath ? [photo.path, photo.thumbPath] : [photo.path])
 
-export interface EditableSite extends Omit<SiteInput, 'language'> {
+export interface EditableSite extends Omit<SiteInput, 'language' | 'category'> {
   id: string
   language: string
+  category: Category | ''
   photos: ExistingPhoto[]
 }
 
 function toRow(input: SiteInput) {
   return {
     name: input.name.trim(),
+    category: input.category,
     description: input.description.trim(),
     collected_on: input.collectedOn,
     collector_name: input.collectorName.trim(),
@@ -91,7 +95,7 @@ export async function getMySite(id: string): Promise<EditableSite | null> {
   const { data, error } = await supabase
     .from('sites')
     .select(
-      'id, name, description, collected_on, collector_name, language, latitude, longitude, location_accuracy_m, site_photos(id, storage_path, thumb_path, caption, sort_order)',
+      'id, name, category, description, collected_on, collector_name, language, latitude, longitude, location_accuracy_m, site_photos(id, storage_path, thumb_path, caption, sort_order)',
     )
     .eq('id', id)
     .maybeSingle()
@@ -100,6 +104,7 @@ export async function getMySite(id: string): Promise<EditableSite | null> {
   return {
     id: data.id,
     name: data.name,
+    category: isCategory(data.category) ? data.category : '',
     description: data.description,
     collectedOn: data.collected_on,
     collectorName: data.collector_name,

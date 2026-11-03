@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
 import { useTranslation } from 'react-i18next'
-import { DEFAULT_CENTER, DEFAULT_ZOOM, SITE_ZOOM, createTileLayer, pinIcon } from '../lib/map'
+import { DEFAULT_CENTER, DEFAULT_ZOOM, SITE_ZOOM, addBaseLayers, pinIcon } from '../lib/map'
 
 export interface PickedLocation {
   latitude: number
@@ -28,6 +28,11 @@ export function LocationPicker({ value, userPosition = null, onChange }: Locatio
   const onChangeRef = useRef(onChange)
   const [locating, setLocating] = useState(false)
   const [gpsError, setGpsError] = useState<GpsError | null>(null)
+  const baseLayerLabelsRef = useRef({
+    group: t('story.mapBackground'),
+    plan: t('story.mapPlan'),
+    satellite: t('story.mapSatellite'),
+  })
 
   useEffect(() => {
     onChangeRef.current = onChange
@@ -37,7 +42,7 @@ export function LocationPicker({ value, userPosition = null, onChange }: Locatio
     const container = containerRef.current
     if (!container) return
     const map = L.map(container).setView(DEFAULT_CENTER, DEFAULT_ZOOM)
-    createTileLayer().addTo(map)
+    addBaseLayers(map, baseLayerLabelsRef.current)
     map.on('click', (event: L.LeafletMouseEvent) =>
       onChangeRef.current({ latitude: event.latlng.lat, longitude: event.latlng.lng, accuracy: null }),
     )

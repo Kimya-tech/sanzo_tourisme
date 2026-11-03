@@ -9,16 +9,21 @@
 | Langue des récits | Rédigés dans la langue de l’interface utilisée lors de la collecte ; affichés tels quels avec une mention dans l’autre langue. |
 | Ordre du parcours | Date de collecte, sauf ordre choisi par l’équipe (`sort_order`). |
 | Centre de la carte | Approximativement Santchou (5,28° N ; 9,98° E) ; la carte se recentre ensuite sur l’ensemble des sites. |
+| Catégories | Six catégories du cahier des charges (patrimoine naturel, historique, culture et traditions, villages, gastronomie et savoir-faire, événements), couleur des repères et légende. Les sites antérieurs sans catégorie apparaissent en gris (« Autre »). |
+| Accueil et identité | Logo du CODESA, photo de couverture (rocher Aleu Ngoueu), présentation reprise de mbosanzo.com, contacts du site de l’association (codesannzo@gmail.com, 699 83 72 27). |
+| Sites « À découvrir » | Les trois premiers sites du parcours (`sort_order`) qui ont une photo. |
 | Modification d’un site | Par son collecteur, depuis le même téléphone. |
 
 ## Questions ouvertes
 
 - Faut-il un petit écran d’administration (masquer, réordonner, corriger) plutôt que le tableau de bord Supabase ?
-- Faut-il ajouter une catégorie ou le village du site (filtre ou couleur des repères) ?
+- Faut-il ajouter le village du site (filtre) ? Faut-il filtrer la carte par catégorie (clic sur la légende) ?
 - Faut-il traduire certains récits (champ anglais saisi par l’équipe) ?
-- Faut-il une vue satellite ? Le fond de carte OpenStreetMap convient pour démarrer, mais ses serveurs publics
-  interdisent un usage intensif : prévoir un fournisseur (MapTiler, Stadia, Thunderforest…) si l’audience grandit.
-- Logo, photo de couverture et texte d’introduction définitifs.
+- Fonds de carte : le plan OpenStreetMap et l’imagerie satellite Esri conviennent pour démarrer, mais leurs
+  serveurs publics ne sont pas prévus pour un usage intensif (Esri demande désormais un compte ArcGIS pour un
+  usage en production) : prévoir un fournisseur avec clé (MapTiler, Stadia…) si l’audience grandit, via les
+  variables `VITE_MAP_*` et `VITE_SATELLITE_*`.
+- Mentions légales : confirmer le nom officiel de l’éditeur, un responsable de la publication et l’adresse.
 
 ## Avant l’ouverture publique
 

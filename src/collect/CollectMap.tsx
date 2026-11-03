@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import L from 'leaflet'
-import { DEFAULT_CENTER, DEFAULT_ZOOM, createTileLayer, pinIcon, prefersReducedMotion } from '../lib/map'
+import { useTranslation } from 'react-i18next'
+import { DEFAULT_CENTER, DEFAULT_ZOOM, addBaseLayers, pinIcon, prefersReducedMotion } from '../lib/map'
 import type { MySite, SitePoint } from './api'
 import type { UserPosition } from './geolocation-context'
 
@@ -58,6 +59,12 @@ export function CollectMap({
   const userLayerRef = useRef<{ dot: L.CircleMarker; halo: L.Circle } | null>(null)
   const centeredOnUserRef = useRef(false)
   const onEditRef = useRef(onEditSite)
+  const { t } = useTranslation()
+  const baseLayerLabelsRef = useRef({
+    group: t('story.mapBackground'),
+    plan: t('story.mapPlan'),
+    satellite: t('story.mapSatellite'),
+  })
 
   useEffect(() => {
     onEditRef.current = onEditSite
@@ -68,7 +75,7 @@ export function CollectMap({
     if (!container) return
     const map = L.map(container, { zoomControl: false }).setView(DEFAULT_CENTER, DEFAULT_ZOOM)
     L.control.zoom({ position: 'topright' }).addTo(map)
-    createTileLayer().addTo(map)
+    addBaseLayers(map, baseLayerLabelsRef.current)
     // Calque dédié : la position de l'utilisateur reste visible au-dessus des repères des sites.
     map.createPane('userPosition').style.zIndex = '640'
     sitesLayerRef.current = L.layerGroup().addTo(map)

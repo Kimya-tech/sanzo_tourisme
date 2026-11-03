@@ -22,7 +22,10 @@ const matches = (query: string) => typeof window !== 'undefined' && window.match
 function applyRoll(viewport: HTMLElement) {
   const items = Array.from(viewport.querySelectorAll<HTMLElement>('.thumbs > li'))
   if (!matches(VERTICAL_LAYOUT)) {
-    for (const item of items) item.removeAttribute('style')
+    for (const item of items) {
+      item.removeAttribute('style')
+      item.classList.remove('is-centered')
+    }
     return
   }
   const [first, second] = items
@@ -31,6 +34,8 @@ function applyRoll(viewport: HTMLElement) {
   if (pitch <= 0) return
   const center = viewport.scrollTop + viewport.clientHeight / 2
   const half = (FOCUS_COUNT - 1) / 2
+  let nearest: HTMLElement | null = null
+  let nearestDistance = Infinity
   for (const item of items) {
     const distance = (item.offsetTop + item.offsetHeight / 2 - center) / pitch
     const beyond = Math.max(0, Math.abs(distance) - half)
@@ -38,7 +43,13 @@ function applyRoll(viewport: HTMLElement) {
     item.style.setProperty('--roll-tilt', `${tilt.toFixed(1)}deg`)
     item.style.setProperty('--roll-scale', (1 - Math.min(beyond, 1.5) * 0.2).toFixed(3))
     item.style.setProperty('--roll-opacity', Math.max(0.08, 1 - beyond * 0.8).toFixed(3))
+    if (Math.abs(distance) < nearestDistance) {
+      nearestDistance = Math.abs(distance)
+      nearest = item
+    }
   }
+  // Le nom de la miniature centrale reste affiché : on lit la liste d'un coup d'œil en la faisant défiler.
+  for (const item of items) item.classList.toggle('is-centered', item === nearest)
 }
 
 export function SiteThumbnails({ sites, activeId, onSelect, onHover }: SiteThumbnailsProps) {

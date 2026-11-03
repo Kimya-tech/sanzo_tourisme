@@ -1,8 +1,11 @@
 // Brouillon du formulaire conservé sur l'appareil : une coupure de réseau ou un rechargement
 // ne fait pas perdre la saisie. Les photos ne sont pas conservées (taille du stockage local).
 
+import { isCategory, type Category } from '../lib/categories'
+
 export interface SiteDraft {
   name: string
+  category: Category | ''
   description: string
   collectedOn: string
   collectorName: string
@@ -23,6 +26,7 @@ export function loadDraft(): SiteDraft | null {
     const num = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? v : null)
     return {
       name: text(value.name),
+      category: isCategory(value.category) ? value.category : '',
       description: text(value.description),
       collectedOn: text(value.collectedOn),
       collectorName: text(value.collectorName),

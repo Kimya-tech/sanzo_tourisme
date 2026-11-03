@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { isLanguage, type Language } from '../i18n/languages'
+import { isCategory, type Category } from '../lib/categories'
 import type { Database } from '../lib/database.types'
 import { supabase } from '../lib/supabase'
 
@@ -21,6 +22,7 @@ export interface StorySite {
   collectedOn: string
   collectorName: string
   language: Language
+  category: Category | null
   latitude: number
   longitude: number
   photos: StoryPhoto[]
@@ -54,6 +56,7 @@ export function toStorySite(row: StorySiteRow): StorySite | null {
     collectedOn: row.collected_on ?? '',
     collectorName: row.collector_name ?? '',
     language: isLanguage(row.language) ? row.language : 'fr',
+    category: isCategory(row.category) ? row.category : null,
     latitude: row.latitude,
     longitude: row.longitude,
     photos: toPhotos(row.photos),
